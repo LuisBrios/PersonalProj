@@ -6,6 +6,8 @@ using namespace std;
 
 const int movesX[] = {-1, -1, -1, 0, 0, 1, 1, 1};
 const int movesY[] = {-1, 0, 1, -1, 1, -1, 0, 1}; 
+int xMax = 0;
+int yMax = 0; 
 vector<vector<char>> mineBoard; 
 vector<vector<char>> playerBoard; 
 
@@ -30,15 +32,27 @@ void boardCreate (int x, int y) {
 }
 
 //check mines near with moves. 
-void checkNearbyMines(int x, int y){
-
+int checkNearbyMines(int y, int x){
+    int numMines = 0; 
+    for (int i = 0; i < 8; ++i) {
+        if ((movesX[i] + x > xMax) || (movesY[i] + y > yMax) || (movesX[i] + x < 0) || (movesY[i] + y < 0)){
+            continue;
+        } else {
+            if (mineBoard[y][x] == '*'){
+                ++numMines; 
+            }
+        }
+    }
+    return numMines; 
 }
 
 bool mineChecker (int x, int y) {
+    int mineVal = 0; 
     if (mineBoard[y][x] == '*'){
         return true; 
     } else {
-        checkNearbyMines(x, y);
+        mineVal = checkNearbyMines(x, y);
+        mineBoard[y][x] = mineVal; 
         return false; 
     }
 }
@@ -67,6 +81,8 @@ void mineInitiation(int lvl) {
     } else if (lvl == 3){
         dimensionX = 11, dimensionY = 11, numMines = 30; 
     }
+    yMax = dimensionY;
+    xMax = dimensionX; 
     mineBoard.resize(dimensionY, vector<char>(dimensionX, '-'));
     playerBoard.resize(dimensionY, vector<char>(dimensionX, '-'));
     mineSetter(dimensionX, dimensionY, numMines);
@@ -91,6 +107,7 @@ int main() {
         cout << "Select a coordinate: " << endl; 
         cin >> xSpot >> ySpot; 
         detonated = mineChecker(ySpot, xSpot);
+        boardCreate(xMax, yMax); 
     }
     return 0;
 }
